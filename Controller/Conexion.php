@@ -10,7 +10,7 @@ class Conexion
     public function conectar()
     {
         try {
-            self::$conexion = mysqli_connect(Constantes::$host, Constantes::$user, Constantes::$pass, Constantes::$database, Constantes::$port);
+            self::$conexion = new mysqli(Constantes::$host, Constantes::$user, Constantes::$pass, Constantes::$database, Constantes::$port);
         } catch (Exception $e) {
             die();
         }
@@ -21,3 +21,4 @@ class Conexion
         mysqli_close(self::$conexion);
     }
 }
+        
