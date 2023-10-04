@@ -23,34 +23,39 @@ $mesg = "todo bien";
 switch ($requestMethod) {
     case 'GET': {
             $persona = new Persona();
-            
-            $checkPersona = $persona->checkLogin($decode['email'],$decode['pass']);
+
+            $checkPersona = $persona->checkLogin($decode['email'], $decode['pass']);
 
             if ($checkPersona) {
                 $partida = new Partida();
 
-                if(!empty($v[1] && !empty($v[2]))){
-                    
-                    $partida->crearTablero($v[1],$v[2]);
-                    
-                    if(!empty($decode['pos']))
-                    $posGolpeo = $decode['pos'];
-                    else   $posGolpeo= 0;
+                if (!empty($v[1] && !empty($v[2]))) {
+
+                    $partida->crearTablero($v[1], $v[2]);
+
+                    if (!empty($decode['pos'])) {
+                        $posGolpeo = $decode['pos'];
+                    } else {
+                        $posGolpeo = 0;
+                    }
 
                     $cod = $partida->darManotazo($posGolpeo);
-                    
+
                     switch ($cod) {
                         case 0:
                         case 1:
                             $partida->getTableroInvisible($idUser);
                             break;
-                            
+
                         case 2:
-                            $partida->getTabl($idUser);
+
+                            break;
+                        default: {
+                                $partida->getTableroInvisible($idUser);
+                            }
                             break;
                     }
                 }
-
             } else {
                 $cod = 206;
                 $mesg = "ERROR CREDENTIALS USER";
@@ -60,47 +65,19 @@ switch ($requestMethod) {
         break;
 
     case 'POST': {
-        // if (!empty($v[1])) {
-        //     $p = new Partida();
-        //     $idUser = $v[1];
-        //     $p->getTableroInvisible($idUser);
+            // if (!empty($v[1])) {
+            //     $p = new Partida();
+            //     $idUser = $v[1];
+            //     $p->getTableroInvisible($idUser);
 
-        // } else {
-        //     $cod = 406;
-        //     $mesg = "ERROR ID USER";
-        //     echo json_encode(['cod' => $cod, 'mesg' => $mesg]);
-        // }
-    }
+            // } else {
+            //     $cod = 406;
+            //     $mesg = "ERROR ID USER";
+            //     echo json_encode(['cod' => $cod, 'mesg' => $mesg]);
+            // }
+        }
 
-    break;
-
-    case 'DELETE' :{
-        // if (!empty($v[1])) {
-        //     $p = new Partida();
-        //     $idUser = $v[1];
-        //     $p->getTableroInvisible($idUser);
-        // } else {
-        //     $cod = 406;
-        //     $mesg = "ERROR ID USER";
-        //     echo json_encode(['cod' => $cod, 'mesg' => $mesg]);
-        // }
-    }
-
-    break;
-
-    case 'UPDATE': {
-        // if (!empty($v[1])) {
-        //     $p = new Partida();
-        //     $idUser = $v[1];
-        //     $p->getTableroInvisible($idUser);
-        // } else {
-        //     $cod = 406;
-        //     $mesg = "ERROR ID USER";
-        //     echo json_encode(['cod' => $cod, 'mesg' => $mesg]);
-        // }
-    }
-    
-    break;
+        break;
 
     default: {
             $cod = 405;
