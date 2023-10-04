@@ -1,6 +1,7 @@
 <?php
 
-require_once 'Constantes.php';
+require __DIR__.'/Constantes.php';
+
 
 class Conexion
 {
@@ -21,4 +22,3 @@ class Conexion
         mysqli_close(self::$conexion);
     }
 }
-        

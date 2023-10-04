@@ -1,5 +1,7 @@
 <?php
 
+namespace Constantes;
+
 class Constantes{
     static $host = "localhost";
     static $user = "root";

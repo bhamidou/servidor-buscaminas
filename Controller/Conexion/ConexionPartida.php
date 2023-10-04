@@ -1,6 +1,6 @@
 <?php
 
-
+require __DIR__.'/Controller/Conexion.php';
 class ConexionPartida{
     public function getPartida(){
         $con = new Conexion();
