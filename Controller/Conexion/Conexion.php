@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/Constantes.php';
+require __DIR__.'../../../Constantes.php';
 
 
 class Conexion

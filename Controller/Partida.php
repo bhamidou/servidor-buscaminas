@@ -1,7 +1,6 @@
 <?php
 
-require_once 'Constantes.php';
-require_once 'Conexion.php';
+require_once __DIR__.'/Conexion/Conexion.php';
 
 class Partida{
 
@@ -11,12 +10,12 @@ class Partida{
         /**
          * 0-> nada
          * 1 -> al lado
-         * 2 -> le has
+         * 2 -> le has dado
          */
         $code = 0;
         if( $this->tablero[$pos] == '*'){
             $code = 2;
-        }else if($this->tablero[$pos-1] == '*' || $this->tablero[$pos+1] == '*'){
+        }elseif($this->tablero[$pos-1] == '*' || $this->tablero[$pos+1] == '*'){
             $code = 1;
         }
         

@@ -24,8 +24,7 @@ switch ($requestMethod) {
     case 'GET': {
             $persona = new Persona();
 
-            $checkPersona = $persona->checkLogin($decode['email'], $decode['pass']);
-
+            // $checkPersona = $persona->checkLogin($decode['email'], $decode['pass']);
             if ($checkPersona) {
                 $partida = new Partida();
 
@@ -44,14 +43,14 @@ switch ($requestMethod) {
                     switch ($cod) {
                         case 0:
                         case 1:
-                            $partida->getTableroInvisible($idUser);
+                            // $partida->getTableroInvisible($idUser);
                             break;
 
                         case 2:
 
                             break;
                         default: {
-                                $partida->getTableroInvisible($idUser);
+                                // $partida->getTableroInvisible($idUser);
                             }
                             break;
                     }

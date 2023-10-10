@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/Controller/Conexion.php';
+require __DIR__.'../Conexion.php';
 
 class ConexionPersona{
     public function checkLogin($email,$pass){
