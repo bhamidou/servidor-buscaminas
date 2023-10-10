@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/Conexion/Conexion.php';
 
-class Partida{
+class Usuario{
 
     private $tablero;
 

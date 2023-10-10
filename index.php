@@ -25,8 +25,9 @@ switch ($requestMethod) {
             $persona = new Persona();
 
             // $checkPersona = $persona->checkLogin($decode['email'], $decode['pass']);
+
             if ($checkPersona) {
-                $partida = new Partida();
+                $partida = new Usuario();
 
                 if (!empty($v[1] && !empty($v[2]))) {
 

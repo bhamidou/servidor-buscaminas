@@ -2,7 +2,7 @@
 
 require __DIR__.'../Conexion.php';
 
-class ConexionPersona{
+class ConexionUsuario{
     public function checkLogin($email,$pass){
         $con = new Conexion();
         $con->conectar();
@@ -31,4 +31,6 @@ class ConexionPersona{
         
         return $check;
     }
+
+    
 }
