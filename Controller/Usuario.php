@@ -1,10 +1,23 @@
 <?php
 
-require_once __DIR__.'/Conexion/Conexion.php';
+// require_once __DIR__.'/Conexion/Conexion.php';
+require_once __DIR__.'/Conexion/ConexionUsuario.php';
 
 class Usuario{
 
+
+    private $id;
+    private $email;
+    private $pass;
+    private $nombre;
     private $tablero;
+    private $estadoPartida;
+
+    public function __construct($id,$email, $pass) {
+		$this->id = $id;
+        $this->email= $email;
+		$this->pass = $pass;
+	}
 
     public function darManotazo($pos){
         /**
@@ -34,5 +47,13 @@ class Usuario{
 
         $this->tablero =$rtnVec;
     }
+
+    public function changePassword($newPw){
+        $conexionUsuario = new ConexionUsuario();
+
+        $conexionUsuario->updatePassword(1, $newPw);
+    }
     
 }
+
+
