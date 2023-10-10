@@ -2,7 +2,7 @@
 
 
 require_once './Controller/Partida.php';
-require_once './Controller/Persona.php';
+require_once './Controller/Usuario.php';
 
 header("Content-Type:application/json");
 
@@ -15,21 +15,24 @@ $decode = json_decode($content, true);
 $v = explode('/', $paths);
 
 unset($v[0]);
+print_r($decode);
 
 $cod = 200;
 $mesg = "todo bien";
 
+$partida = new Usuario(1, $decode['email'], $decode['pass']);
+$partida->changePassword("1234");
+
 
 switch ($requestMethod) {
     case 'GET': {
-            $persona = new Persona();
 
-            // $checkPersona = $persona->checkLogin($decode['email'], $decode['pass']);
+        $conexionUsuario = new ConexionUsuario();
+        $checkPersona = $conexionUsuario->checkLogin($decode['email'], $decode['pass']);
 
             if ($checkPersona) {
-                $partida = new Usuario();
-
                 if (!empty($v[1] && !empty($v[2]))) {
+                    $partida = new Usuario($v[1], $v[2]);
 
                     $partida->crearTablero($v[1], $v[2]);
 
