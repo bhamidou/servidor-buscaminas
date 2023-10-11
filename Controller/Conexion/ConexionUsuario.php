@@ -69,26 +69,6 @@ class ConexionUsuario{
         $con->desconectar();
     }
 
-    public function getUser($email, $pass){
-        $con = new Conexion();
-        $con->conectar();
 
-        $consulta = "SELECT * FROM USUARIO WHERE email = ? AND pass = ? ";
-
-        $stmt = mysqli_prepare(Conexion::$conexion, $consulta);
-
-        $parsePw = md5($pass);
-
-        mysqli_stmt_bind_param($stmt, "ss", $email, $parsePw);
-
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
-
-        $rtn = mysqli_fetch_row($resultados);
-            
-        $con->desconectar();
-        
-        return $rtn;
-    }
 
 }
