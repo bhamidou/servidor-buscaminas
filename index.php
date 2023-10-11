@@ -20,14 +20,16 @@ $cod = 200;
 $mesg = "todo bien";
 
 
-switch ($requestMethod) {
-    case 'GET': {
 
+switch ($requestMethod) {
+
+    case 'GET': {
         $conexionUsuario = new ConexionUsuario();
         $checkPersona = $conexionUsuario->checkLogin($decode['email'], $decode['pass']);
-
+        print_r($conexionUsuario->getUser($decode['email'], $decode['pass']));
             if ($checkPersona) {
                 if (!empty($v[1] && !empty($v[2]))) {
+                    $getDatosUser = $conexionUsuario->getUser($decode['email'], $decode['pass']);
                     $user = new Usuario(1,$decode['email'], $decode['pass']);
 
                     $partida->crearTablero($v[1], $v[2]);
