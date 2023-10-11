@@ -52,6 +52,22 @@ class ConexionUsuario{
 
     }
 
+    function createUser($email, $pass, $nombre){
+        $con = new Conexion();
+        $con->conectar();
+
+        $consulta = "INSERT INTO USUARIO (email, pass, nombre) VALUES (?, ?, ?)";
+
+        $stmt = mysqli_prepare(Conexion::$conexion, $consulta);
+
+        $hashPw = md5($pass);
+
+        mysqli_stmt_bind_param($stmt, "sss", $email, $hashPw, $nombre);
+
+        mysqli_stmt_execute($stmt);
+
+        $con->desconectar();
+    }
 
 
 
