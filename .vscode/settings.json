@@ -9,5 +9,10 @@
         "mesg",
         "otro",
         "soporte"
+    ],
+    "cSpell.ignoreWords": [
+        "buscaminas",
+        "lado",
+        "nada"
     ]
 }

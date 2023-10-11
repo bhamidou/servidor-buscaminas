@@ -2,7 +2,7 @@
 
 
 require_once './Controller/Partida.php';
-require_once './Controller/Persona.php';
+require_once './Controller/Usuario.php';
 
 header("Content-Type:application/json");
 
@@ -22,14 +22,13 @@ $mesg = "todo bien";
 
 switch ($requestMethod) {
     case 'GET': {
-            $persona = new Persona();
 
-            $checkPersona = $persona->checkLogin($decode['email'], $decode['pass']);
+        $conexionUsuario = new ConexionUsuario();
+        $checkPersona = $conexionUsuario->checkLogin($decode['email'], $decode['pass']);
 
             if ($checkPersona) {
-                $partida = new Partida();
-
                 if (!empty($v[1] && !empty($v[2]))) {
+                    $user = new Usuario(1,$decode['email'], $decode['pass']);
 
                     $partida->crearTablero($v[1], $v[2]);
 
@@ -44,14 +43,14 @@ switch ($requestMethod) {
                     switch ($cod) {
                         case 0:
                         case 1:
-                            $partida->getTableroInvisible($idUser);
+                            // $partida->getTableroInvisible($idUser);
                             break;
 
                         case 2:
 
                             break;
                         default: {
-                                $partida->getTableroInvisible($idUser);
+                                // $partida->getTableroInvisible($idUser);
                             }
                             break;
                     }
