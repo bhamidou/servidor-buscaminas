@@ -15,13 +15,9 @@ $decode = json_decode($content, true);
 $v = explode('/', $paths);
 
 unset($v[0]);
-print_r($decode);
 
 $cod = 200;
 $mesg = "todo bien";
-
-$partida = new Usuario(1, $decode['email'], $decode['pass']);
-$partida->changePassword("1234");
 
 
 switch ($requestMethod) {
@@ -32,7 +28,7 @@ switch ($requestMethod) {
 
             if ($checkPersona) {
                 if (!empty($v[1] && !empty($v[2]))) {
-                    $partida = new Usuario($v[1], $v[2]);
+                    $user = new Usuario(1,$decode['email'], $decode['pass']);
 
                     $partida->crearTablero($v[1], $v[2]);
 
