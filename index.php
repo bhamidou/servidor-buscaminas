@@ -19,44 +19,24 @@ unset($v[0]);
 $cod = 200;
 $mesg = "todo bien";
 
+$user = new Usuario(1, "badrhamidou@gmail.com", $decode['pass']);
+$user->changePassword("123456");
 
 switch ($requestMethod) {
     case 'GET': {
 
-        $conexionUsuario = new ConexionUsuario();
-        $checkPersona = $conexionUsuario->checkLogin($decode['email'], $decode['pass']);
-
+            $conexionUsuario = new ConexionUsuario();
+            $checkPersona = $conexionUsuario->checkLogin($decode['email'], $decode['pass']);
             if ($checkPersona) {
-                if (!empty($v[1] && !empty($v[2]))) {
-                    $user = new Usuario(1,$decode['email'], $decode['pass']);
+                $getUser = $conexionUsuario->getUser($decode['email'], $decode['pass']);
+                $user = new Usuario($getUser[0],  $getUser[1], $getUser[2]);
+                
+                // $partida = new Partida();
+                // $partida->crearTablero($v[1]=10, $v[2]=2);
 
-                    $partida->crearTablero($v[1], $v[2]);
-
-                    if (!empty($decode['pos'])) {
-                        $posGolpeo = $decode['pos'];
-                    } else {
-                        $posGolpeo = 0;
-                    }
-
-                    $cod = $partida->darManotazo($posGolpeo);
-
-                    switch ($cod) {
-                        case 0:
-                        case 1:
-                            // $partida->getTableroInvisible($idUser);
-                            break;
-
-                        case 2:
-
-                            break;
-                        default: {
-                                // $partida->getTableroInvisible($idUser);
-                            }
-                            break;
-                    }
-                }
+                $cod = $partida->darManotazo($posGolpeo);
             } else {
-                $cod = 206;
+                $cod = 401;
                 $mesg = "ERROR CREDENTIALS USER";
                 echo json_encode(['cod' => $cod, 'mesg' => $mesg]);
             }

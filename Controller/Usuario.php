@@ -2,11 +2,10 @@
 
 // require_once __DIR__.'/Conexion/Conexion.php';
 require_once __DIR__ . '/Conexion/ConexionUsuario.php';
+require_once __DIR__. '/Mail/Mail.php';
 
 class Usuario
 {
-
-
     private $id;
     private $email;
     private $pass;
@@ -57,6 +56,10 @@ class Usuario
         $conexionUsuario = new ConexionUsuario();
 
         $conexionUsuario->updatePassword(1, $newPw);
+
+        $mail = new Mail();
+        $mail->sendmail($this->email, $this->nombre, "Solicitud de nueva contraseña", $newPw);
+        
     }
 
     public function getId()
@@ -97,16 +100,6 @@ class Usuario
     public function setNombre($value)
     {
         $this->nombre = $value;
-    }
-
-    public function getTablero()
-    {
-        return $this->tablero;
-    }
-
-    public function setTablero($value)
-    {
-        $this->tablero = $value;
     }
 
     public function getEstadoPartida()
