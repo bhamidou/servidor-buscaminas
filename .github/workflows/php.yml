@@ -1,0 +1,42 @@
+name: DevOps
+
+on:
+  [push, pull_request]
+
+env:
+  phpVersion: '8.1'
+
+jobs:
+  deploy:
+    runs-on: debian-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@master
+      with:
+        php-version: ${{ env.phpVersion }}
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install PHP dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest --no-scripts
+
+    - name: Deploy
+      uses: deployphp/action@v1
+      env:
+        DEP_PATH: ${{ secrets.DEP_PATH }}
+      with:
+        private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+        dep: deploy -v
