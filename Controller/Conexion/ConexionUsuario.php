@@ -75,16 +75,16 @@ class ConexionUsuario{
 
         $consulta = "SELECT * FROM USUARIO WHERE email = ? AND pass = ? ";
 
-        $stmt = mysqli_prepare(Conexion::$conexion, $consulta);
+        $stmt = Conexion::$conexion($consulta);
 
         $parsePw = md5($pass);
 
-        mysqli_stmt_bind_param($stmt, "ss", $email, $parsePw);
+        $stmt->bind_param("ss", $email, $parsePw);
 
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
+        $stmt->execute();
+        $resultados = $stmt->get_result();
 
-        $rtnUser = mysqli_fetch_row($resultados);
+        $rtnUser =$resultados->fetch_array();
 
         $con->desconectar();
         
