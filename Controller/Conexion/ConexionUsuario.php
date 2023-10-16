@@ -3,36 +3,6 @@
 require __DIR__.'../Conexion.php';
 
 class ConexionUsuario{
-    public function checkLogin($email,$pass){
-        $con = new Conexion();
-        $con->conectar();
-
-        $consulta = "SELECT * FROM USUARIO WHERE email = ? AND pass = ? ";
-
-        $stmt = mysqli_prepare(Conexion::$conexion, $consulta);
-
-        $parsePw = md5($pass);
-
-        mysqli_stmt_bind_param($stmt, "ss", $email, $parsePw);
-
-        mysqli_stmt_execute($stmt);
-        $resultados = mysqli_stmt_get_result($stmt);
-
-        $rtn = [];
-
-        while ($fila = mysqli_fetch_row($resultados)) {
-            $rtn[] = [$fila[1],$fila[2]];
-        }
-        
-        $check = false;
-        if($email == !empty($rtn[0][0]) && $pass == !empty($rtn[0][1])){
-            $check = true;
-        }
-
-        $con->desconectar();
-        
-        return $check;
-    }
 
     public function updatePassword($id, $newPw){
         $con = new Conexion();
@@ -69,13 +39,18 @@ class ConexionUsuario{
         $con->desconectar();
     }
 
-    public function getUser($email,$pass){
+
+    // public function getUser(){
+
+    // }
+
+    public function getUserByEmailAndPass($email,$pass){
         $con = new Conexion();
         $con->conectar();
 
         $consulta = "SELECT * FROM USUARIO WHERE email = ? AND pass = ? ";
 
-        $stmt = Conexion::$conexion($consulta);
+        $stmt = Conexion::$conexion->prepare($consulta);
 
         $parsePw = md5($pass);
 
@@ -89,6 +64,28 @@ class ConexionUsuario{
         $con->desconectar();
         
         return $rtnUser;
+
+        // $con = new Conexion();
+        // $con->conectar();
+
+        // $consulta = "SELECT * FROM USUARIO WHERE email = ? AND pass = ? ";
+
+        // $stmt = mysqli_prepare(Conexion::$conexion, $consulta);
+
+        // $parsePw = md5($pass);
+
+        // mysqli_stmt_bind_param($stmt, "ss", $email, $parsePw);
+
+        // mysqli_stmt_execute($stmt);
+        // $resultados = mysqli_stmt_get_result($stmt);
+
+        // $rtn =  mysqli_fetch_row($resultados);
+        
+
+        // $con->desconectar();
+        
+        // return $rtn;
+
     }
 
 
