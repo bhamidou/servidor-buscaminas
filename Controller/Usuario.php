@@ -12,12 +12,11 @@ class Usuario
     private $nombre;
     private $tablero;
     private $estadoPartida;
+    private $role;
 
-    public function __construct($id, $email, $pass)
+    public function __toString()
     {
-        $this->id = $id;
-        $this->email = $email;
-        $this->pass = $pass;
+        return 'id: '.$this->id.'email: '.$this->email.'pass: ' . $this->pass. 'nombre: ' . $this->nombre. 'tablero: ' . $this->tablero. 'estadoPartida: ' . $this->estadoPartida;
     }
 
     public function darManotazo($pos)
@@ -60,6 +59,17 @@ class Usuario
         $mail = new Mail();
         $mail->sendmail($this->email, $this->nombre, "Solicitud de nueva contraseña", $newPw);
         
+    }
+
+    public function setUser($arrValues){
+
+        $this->setId($arrValues[1]);
+        $this->setEmail($arrValues[2]);
+        $this->setPass($arrValues[3]);
+        $this->setnombre($arrValues[4]);
+        $this->setEstadoPartida($arrValues[5]);
+        $this->setTablero($arrValues[6]);
+        $this->setRole($arrValues[7]);
     }
 
     public function getId()
@@ -111,4 +121,18 @@ class Usuario
     {
         $this->estadoPartida = $value;
     }
+    public function getTablero() {
+		return $this->tablero;
+	}
+
+	public function setTablero($value) {
+		$this->tablero = $value;
+	}
+    public function getRole() {
+		return $this->role;
+	}
+
+	public function setRole($value) {
+		$this->role = $value;
+	}
 }
