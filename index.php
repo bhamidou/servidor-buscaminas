@@ -5,8 +5,9 @@ require_once './Controller/Partida.php';
 require_once './Controller/Usuario.php';
 require_once './Controller/Service/ServiceUser.php';
 require_once './Controller/Service/ServicePartida.php';
+require_once './Controller/Service/ServiceJSON.php';
 
-header('Content-Type: application/json; charset=utf-8');
+
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 $paths = $_SERVER['REQUEST_URI'];
@@ -16,17 +17,22 @@ $decode = json_decode($content, true);
 
 $ruta = explode('/', $paths);
 
-unset($v[0]);
+unset($ruta[0]);
 
 $cod = 200;
 $mesg = "todo bien";
 
-$isAdmin = false;
-$isUser = false;
 
+//servicios que se van a ir llamando
 $servicePartida = new ServicePartida();
 $serviceUsuario = new ServiceUser();
+$serviceJSON = new ServiceJSON();
+
 $checkPersona = $serviceUsuario->login($decode['email'], $decode['pass']);
+
+//para comprobar el tipo de usuario
+$isAdmin = false;
+$isUser = false;
 
 if ($checkPersona) {
     $getUser = $serviceUsuario->getUser($decode['email'], $decode['pass']);
@@ -92,6 +98,7 @@ if ($isAdmin) {
                         break;
                     case 'ranking':
                         $servicePartida->getRanking();
+                        $code = 200;
                         break;
                     default:
                         $code = 401;
@@ -101,7 +108,18 @@ if ($isAdmin) {
             break;
 
         case 'POST': {
-                //
+                switch ($ruta) {
+                    case 'jugar':
+
+                        break;
+                    case 'size':
+
+
+                        break;
+                    default:
+
+                        break;
+                }
             }
 
             break;
@@ -109,13 +127,14 @@ if ($isAdmin) {
         default: {
                 $cod = 405;
                 $mesg = "METHOD NOT SUPPORTED YET";
-                echo json_encode(['cod' => $cod, 'mesg' => $mesg]);
+                $serviceJSON->send($cod, $mesg);
             }
     }
 } else {
 
     $cod = 401;
     $mesg = "ERROR USER CREDENTIALS";
-    echo json_encode(['cod' => $cod, 'mesg' => $mesg]);
+
+
+    $serviceJSON->send($cod, $mesg);
 }
-header("HTTP/1.1 $cod $mesg");
