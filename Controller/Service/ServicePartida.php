@@ -68,6 +68,18 @@ class ServicePartida {
         
     }
 
+    public function surrender($idUser){
+        $partida = new ConexionPartida();
+        $serviceJSON = new ServiceJSON();
+        
+        $partida->updatePartidaRendirse($idUser);
+        $tablero = $partida->getTableroResuelto($idUser);
+
+        $cod = 201;
+        $mesg = "OK";
+        $serviceJSON->send($cod, $mesg, $tablero["resuelto"]);
+
+    }
     public function getTableroInvisible($idUser){
         $partida = new ConexionPartida();
         return $partida->getTableroInvisible($idUser);
