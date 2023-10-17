@@ -85,6 +85,31 @@ class ServiceUser
         }
     }
 
+    public function updateNombre($nombre, $email){
+        
+        $serviceJSON = new ServiceJSON();
+        $conexionUsuario = new ConexionUsuario();
+
+        $conexionUsuario->updateNombre($nombre, $email);
+
+        $code = 200;
+        $mesg = "OK";
+        $serviceJSON->send($code, $mesg);
+    }
+    
+    public function updateRole($role, $email){
+        
+        $serviceJSON = new ServiceJSON();
+        $conexionUsuario = new ConexionUsuario();
+
+        $conexionUsuario->updateRole($role, $email);
+
+        $code = 200;
+        $mesg = "OK";
+        $serviceJSON->send($code, $mesg);
+    }
+
+
 
     public function deleteUser($idUser){
         $serviceJSON = new ServiceJSON();
