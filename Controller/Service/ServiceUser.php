@@ -40,9 +40,17 @@ class ServiceUser
             $user = new ConexionUsuario();
 
             $rtnUser = $user->getUserById($idUser);
-            $code = 200;
-            $mesg = "OK";
-            $serviceJSON->send($code, $mesg, $rtnUser);
+    
+            if(empty($rtnUser)){
+                $code = 404;
+                $mesg = "NOT FOUND";
+                $serviceJSON->send($code, $mesg);
+            }else{
+
+                $code = 200;
+                $mesg = "OK";
+                $serviceJSON->send($code, $mesg, $rtnUser);
+            }
         } else {
             $code = 400;
             $mesg = "REQUIRED ID USER";
