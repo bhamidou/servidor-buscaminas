@@ -19,9 +19,6 @@ $ruta = explode('/', $paths);
 
 unset($ruta[0]);
 
-$cod = 200;
-$mesg = "todo bien";
-
 
 //servicios que se van a ir llamando
 $servicePartida = new ServicePartida();
@@ -38,11 +35,11 @@ if ($checkPersona) {
     $getUser = $serviceUsuario->getUser($decode['email'], $decode['pass']);
     $user = new Usuario();
     $user->setUser($getUser);
-
+    
     if ($user->getRole() == 1) {
-        $isUser = true;
-    } elseif ($user->getRole() == 0) {
         $isAdmin = true;
+    } elseif ($user->getRole() == 0) {
+        $isUser = true;
     }
 }
 
@@ -56,7 +53,36 @@ if ($isAdmin) {
          * POST: /admin/user
          */
         case 'GET': {
-                //switch listar, buscar y solicitar una nueva contraseña a un usuario, y jugar
+                //switch listar, buscar y solicitar una nueva contraseña a un usuario, y jugar 
+                switch ($ruta[1]) {
+                    case 'jugar':
+                        $servicePartida->uncoverCasilla();
+                        break;
+                    case 'ranking':{
+                        $servicePartida->getRanking();
+                    }
+                    break;
+                    case 'admin':{
+                        switch ($ruta[2]) {
+                            case 'users':
+                                $serviceUsuario->getUsers();
+                                break;
+                            case 'user':{
+                                $serviceUsuario->getUserById($ruta[3]);
+                            }
+                            break;
+                            default:
+                            $cod = 404;
+                            $mesg = "ROUTE NOT FOUND";
+                            $serviceJSON->send($code,$mesg);
+                                break;
+                        }
+                    }
+                    break;
+                    default:
+                        
+                        break;
+                }
             }
             break;
 
@@ -77,7 +103,7 @@ if ($isAdmin) {
         default: {
                 $cod = 405;
                 $mesg = "METHOD NOT SUPPORTED YET";
-                echo json_encode(['cod' => $cod, 'mesg' => $mesg]);
+                $serviceJSON->send($code,$mesg);
             }
             break;
     }
@@ -86,22 +112,31 @@ if ($isAdmin) {
             /**
          * GET: /newpass
          * GET: /ranking
+         * GET: /jugar/size/numFlags
          * POST: /jugar
-         * POST: /jugar/size/numFlags
          */
         case 'GET': {
-                switch ($ruta) {
-                    case 'newpass':
+                switch ($ruta[1]) {
+                    case 'newpass':{
                         $serviceUsuario->newPassword($user->getEmail());
-                        $code = 202;
-                        $mesg = "UPDATED PASSWORD";
+                    }
                         break;
-                    case 'ranking':
+                    case 'ranking':{
                         $servicePartida->getRanking();
-                        $code = 200;
+                    }
                         break;
+                    case 'jugar':{
+                        $servicePartida->createPartida($user->getId());
+                    }
+                    break;
+                    case 'jugar'.!empty($ruta[2]).!empty($ruta[3]):{
+                        $servicePartida->createPartida($user->getId());
+                    }
+                    break;
                     default:
                         $code = 401;
+                        $mesg = "UNAUTHORIZED ROUTE";
+                        $serviceJSON->send($code,$mesg, $mesg);
                         break;
                 }
             }
@@ -110,6 +145,7 @@ if ($isAdmin) {
         case 'POST': {
                 switch ($ruta) {
                     case 'jugar':
+                        $servicePartida->uncoverCasilla($decode["position"]);
 
                         break;
                     case 'size':
@@ -134,7 +170,6 @@ if ($isAdmin) {
 
     $cod = 401;
     $mesg = "ERROR USER CREDENTIALS";
-
 
     $serviceJSON->send($cod, $mesg);
 }
