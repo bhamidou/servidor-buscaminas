@@ -53,7 +53,7 @@ if ($isAdmin) {
          * POST: /admin/user
          */
         case 'GET': {
-                //switch listar, buscar y solicitar una nueva contraseña a un usuario, y jugar 
+                //switch listar, buscar y solicitar una nueva contraseña a un usuario, y jugar
                 switch ($ruta[1]) {
                     case 'jugar':
                         $servicePartida->uncoverCasilla();
@@ -68,7 +68,13 @@ if ($isAdmin) {
                                 $serviceUsuario->getUsers();
                                 break;
                             case 'user':{
-                                $serviceUsuario->getUserById($ruta[3]);
+                                if(!empty($ruta[4])){
+                                    $email = $serviceUsuario->getEmailUserById($ruta[3]);
+                                    $serviceUsuario->newPassword($email, $decode["newpass"]);
+                                    break;
+                                }
+                                $serviceUsuario->getUserById(!empty($ruta[3]));
+                                
                             }
                             break;
                             default:
