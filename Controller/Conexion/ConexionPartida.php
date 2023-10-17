@@ -53,7 +53,7 @@ class ConexionPartida
         $con = new Conexion();
         $con->conectar();
         
-        $consulta = "UPDATE  ". Constantes::$TABLE_partida."  SET resultado = -1 WHERE idUsuario = ?  ";
+        $consulta = "UPDATE  ". Constantes::$TABLE_partida."  SET resultado = -1 WHERE idUsuario = ?  and resultado = 0";
         $stmt = Conexion::$conexion->prepare($consulta);
 
         $stmt->bind_param("i", $idUser);
@@ -158,6 +158,26 @@ class ConexionPartida
         $con->conectar();
 
         $consulta = "SELECT resultado FROM ". Constantes::$TABLE_partida." where idUsuario = ? order by ID desc";
+
+        $stmt = Conexion::$conexion->prepare($consulta);
+
+        $stmt->bind_param("i", $idUser);
+
+        $stmt->execute();
+        $resultados = $stmt->get_result();
+
+        $rtnResultado = $resultados->fetch_array();
+
+        $con->desconectar();
+        
+        return $rtnResultado;
+    }
+
+    public function getTableroResuelto($idUser){
+        $con = new Conexion();
+        $con->conectar();
+
+        $consulta = "SELECT resuelto FROM ". Constantes::$TABLE_partida." where idUsuario = ?  order by ID desc";
 
         $stmt = Conexion::$conexion->prepare($consulta);
 
