@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../Mail/Mail.php';
+require_once __DIR__ . '/../Mail/Mail.php';
 
 class ServiceUser
 {
@@ -13,7 +13,7 @@ class ServiceUser
 
         $checkDatos = $user->getUserByEmailAndPass($email, $hasPass);
         $rtnCheck = false;
-        if(!empty($checkDatos)){
+        if (!empty($checkDatos)) {
             $rtnCheck = true;
         }
         return $rtnCheck;
@@ -27,18 +27,34 @@ class ServiceUser
         return $rtnUser;
     }
 
-    public function getUserById($idUser){
-        $user = new ConexionUsuario();
-
-        $rtnUser = $user->getUserById($idUser);
+    public function getUserById($idUser)
+    {
 
         $serviceJSON = new ServiceJSON();
-        $code = 200;
-        $mesg = "OK";
-        $serviceJSON->send($code, $mesg, $rtnUser);
+        if (!empty($idUser)) {
+            $user = new ConexionUsuario();
+
+            $rtnUser = $user->getUserById($idUser);
+            $code = 200;
+            $mesg = "OK";
+            $serviceJSON->send($code, $mesg, $rtnUser);
+        } else {
+            $code = 400;
+            $mesg = "REQUIRED ID USER";
+            $serviceJSON->send($code, $mesg);
+        }
     }
 
-    public function getUsers(){
+    public function getEmailUserById($idUser)
+    {
+        $user = new ConexionUsuario();
+
+        $rtnEmail = $user->getUserById($idUser);
+        return $rtnEmail->getEmail();
+    }
+
+    public function getUsers()
+    {
         $user = new ConexionUsuario();
 
         $rtnUsers = $user->getUsers();
@@ -49,25 +65,30 @@ class ServiceUser
         $serviceJSON->send($code, $mesg, $rtnUsers);
     }
 
-    public function newPassword($email, $newPass=null)
+    public function newPassword($email, $newPass = null)
     {
-        if(empty($newPass)){
-            $newPass = $this->generatePassword(8);
-        }
-        
-        $hasPash = md5($newPass);
-
-        $conexionUsuario = new ConexionUsuario();
-
-        $conexionUsuario->updatePassword($email, $hasPash);
-
-        $mail = new Mail();
-        $mail->sendmail();
-
         $serviceJSON = new ServiceJSON();
-        $code = 202;
-        $mesg = "UPDATED PASSWORD";
-        $serviceJSON->send($code, $mesg);
+        if (!empty($email)) {
+            if (empty($newPass)) {
+                $newPass = $this->generatePassword(8);
+            }
+            $hasPash = md5($newPass);
+
+            $conexionUsuario = new ConexionUsuario();
+
+            $conexionUsuario->updatePassword($email, $hasPash);
+
+            $mail = new Mail();
+            $mail->sendmail();
+
+            $code = 202;
+            $mesg = "UPDATED PASSWORD";
+            $serviceJSON->send($code, $mesg, $newPass);
+        } else {
+            $code = 402;
+            $mesg = "EMAIL REQUIRED";
+            $serviceJSON->send($code, $mesg);
+        }
     }
 
 
