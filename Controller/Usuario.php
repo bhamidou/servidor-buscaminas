@@ -6,60 +6,36 @@ require_once __DIR__. '/Mail/Mail.php';
 
 class Usuario
 {
-    private $id;
-    private $email;
-    private $pass;
-    private $nombre;
-    private $tablero;
-    private $estadoPartida;
+    public $id;
+    public $email;
+    public $pass;
+    public $nombre;
+    public $partidasJugadas;
+    public $partidasGanadas;
+    public $role;
 
-    public function __construct($id, $email, $pass)
+
+    public function __toString()
     {
-        $this->id = $id;
-        $this->email = $email;
-        $this->pass = $pass;
+        return 'id: '.$this->id.'email: '.$this->email.'pass: ' . $this->pass. 'nombre: ' . $this->nombre. 'partidasJugadas: ' . $this->partidasJugadas. 'partidasGanadas: ' . $this->partidasGanadas;
     }
 
-    public function darManotazo($pos)
-    {
-        /**
-         * 0-> nada
-         * 1 -> al lado
-         * 2 -> le has dado
-         */
-        $code = 0;
-        if ($this->tablero[$pos] == '*') {
-            $code = 2;
-        } elseif ($this->tablero[$pos - 1] == '*' || $this->tablero[$pos + 1] == '*') {
-            $code = 1;
-        }
-
-        return $code;
+    
+    public function setArrUser($arrValues){
+        $this->setId($arrValues["ID"]);
+        $this->setEmail($arrValues["email"]);
+        $this->setPass($arrValues["pass"]);
+        $this->setnombre($arrValues["nombre"]);
+        $this->setPartidasJugadas($arrValues["partidasJugadas"]);
+        $this->setPartidasGanadas($arrValues["partidasGanadas"]);
+        $this->setRole($arrValues["rol"]);
     }
 
-    public function crearTablero($size, $numMinas)
-    {
-
-        $rtnVec = array_fill(0, $size, '-');
-
-        while ($numMinas >= 0) {
-            $randPos = rand(0, ($size - 1));
-            $rtnVec[$randPos] = '*';
-            $numMinas--;
-        }
-
-        $this->tablero = $rtnVec;
-    }
-
-    public function changePassword($newPw)
-    {
-        $conexionUsuario = new ConexionUsuario();
-
-        $conexionUsuario->updatePassword(1, $newPw);
-
-        $mail = new Mail();
-        $mail->sendmail($this->email, $this->nombre, "Solicitud de nueva contraseña", $newPw);
-        
+    public function setUser($arrValues){
+        $this->setEmail($arrValues["email"]);
+        $this->setPass($arrValues["pass"]);
+        $this->setnombre($arrValues["nombre"]);
+        $this->setRole($arrValues["rol"]);
     }
 
     public function getId()
@@ -102,13 +78,26 @@ class Usuario
         $this->nombre = $value;
     }
 
-    public function getEstadoPartida()
-    {
-        return $this->estadoPartida;
-    }
+    public function getRole() {
+		return $this->role;
+	}
 
-    public function setEstadoPartida($value)
-    {
-        $this->estadoPartida = $value;
-    }
+	public function setRole($value) {
+		$this->role = $value;
+	}
+    public function getPartidasJugadas() {
+		return $this->partidasJugadas;
+	}
+
+	public function setPartidasJugadas($value) {
+		$this->partidasJugadas = $value;
+	}
+
+	public function getPartidasGanadas() {
+		return $this->partidasGanadas;
+	}
+
+	public function setPartidasGanadas($value) {
+		$this->partidasGanadas = $value;
+	}
 }
