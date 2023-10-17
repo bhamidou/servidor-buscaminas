@@ -26,82 +26,126 @@ $checkPersona = $serviceUsuario->login($decode['email'], $decode['pass']);
 if ($checkPersona) {
     $getUser = $serviceUsuario->getUser($decode['email'], $decode['pass']);
     $user = new Usuario();
-    $user->setUser($getUser);
-} else {
-    $code = 401;
-    $msg = "ERROR USER CREDENTIALS";
-    return $serviceJSON->send($code, $msg);
-}
+    $user->setArrUser($getUser);
 
-if ($user->getRole() == 1) {
-    switch ($requestMethod) {
-        case 'GET':
-            if ($ruta[1] == 'admin') {
-                if (!empty($ruta[2])){
-                    switch ($ruta[2]) {
-                        case 'users':
-                            return $serviceUsuario->getUsers();
-                            break;
-                            case 'user':
-                                return $serviceUsuario->getUserById($ruta[3]);
+    if ($user->getRole() == 1) {
+        if ($ruta[1] == 'admin') {
+            switch ($requestMethod) {
+                case 'GET':
+                    if (!empty($ruta[2])) {
+                        switch ($ruta[2]) {
+                            case 'users':
+                                $serviceUsuario->getUsers();
                                 break;
-                            }
-                }else{
-                    notFound($serviceJSON);
+                            case 'user':
+                                if (!empty($ruta[3])) {
+                                    $serviceUsuario->getUserById($ruta[3]);
+                                } else {
+                                    $code = 402;
+                                    $msg = "PARAMETER REQUIRED";
+                                    $serviceJSON->send($code, $msg);
+                                }
+                                break;
+                        }
+                    } else {
+                        notFound($serviceJSON);
+                    }
+
+                    break;
+                case 'POST':
+                    if (!empty($ruta[2]) && $ruta[2] == 'user') {
+                        if(!empty($decode["user"])){
+
+                            $newUser = new Usuario();
+                            $newUser->setUser($decode["user"]);
+                            $serviceUsuario->createUser($newUser);
+                        }else {
+                            noParameters($serviceJSON);
+                        }
+                    } else {
+                        noParameters($serviceJSON);
+                    }
+                    if(!empty($decode["getNewPassword"])){
+                        $email = $decode["getNewPassword"]["email"];
+                        $pass = $decode["getNewPassword"]["pass"];
+                        $serviceUsuario->newPassword($email, $pass);
+                    }
+                    break;
+                case 'PUT':{
+                    if(!empty($decode["update"])){
+                        //checkEmpty de $decode sobre nombre y rol
+                        $serviceUsuario->updateNombre($decode["update"]["nombre"], $decode["update"]["email"]);
+                        $serviceUsuario->updateRole($decode["update"]["rol"], $decode["update"]["email"]);
+                    }
                 }
-
-                break;
-            }
-
-            break;
-        case 'POST':
-            switch ($ruta[1]) {
-                case 'user':
-                    $email = $decode["arrUser"]["email"];
-                    $newUser = new Usuario();
-                    $newUser->setUser($decode["arrUser"]);
-                    $serviceUsuario->createUser($newUser);
-                    // no terminado
-                    return null;
+                    break;
+                case 'DELETE': {
+                        if (!empty($ruta[2]) && !empty($ruta[3]) && $ruta[2] == 'user') {
+                            $serviceUsuario->deleteUser($ruta[3]);
+                        }
+                    }
+                    break;
+                default: {
+                        notFound($serviceJSON);
+                    }
                     break;
             }
-            break;
-        case 'PUT':
-            // Cambiar los datos de un usuario
-            break;
-        case 'DELETE':
-            // Eliminar un usuario
-            break;
+        }
+    }
+    if ($user->getRole() >= 0 && $ruta[1] == 'jugar' || $ruta[1] == 'ranking') {
+        switch ($requestMethod) {
+            case 'GET':
+                switch ($ruta[1]) {
+                    case 'jugar':{
+                        $servicePartida->createPartida($user->getId());
+                    }
+                        break;
+                    case 'ranking':{
+                        $servicePartida->getRanking();
+                    }
+                        break;
+                    case 'surrender':{
+                        $servicePartida->surrender($idUser);
+                    }
+                    default:
+                        notFound($serviceJSON);
+                }
+                break;
+            case 'POST':
+                switch ($ruta[1]) {
+                    case 'jugar':
+                        $servicePartida->uncoverCasilla($user->getId());
+                        break;
+                    default:{
+                            notFound($serviceJSON);
+                    }
+                    break;
+                }
+                break;
+            default:
+                notSupported($serviceJSON);
+        }
+    }
+} else {
+    // en caso de que el usuario no tenga credenciales
+    if (!empty($ruta[1]) && $ruta[1] == 'signup') {
+        $serviceUsuario->createUser($decode["user"]);
+
+        //en caso de que el usuario tenga credenciales 
+        //pero no sepa su contraseña
+    }elseif(!empty($ruta[1]) && $ruta[1] == 'password'){
+        if(!empty($decode["getNewPassword"])){
+            $email = $decode["getNewPassword"]["email"];
+            $pass = $decode["getNewPassword"]["pass"];
+            $serviceUsuario->newPassword($email, $pass);
+        }
+    } else{
+        $code = 401;
+        $msg = "ERROR USER CREDENTIALS";
+        $serviceJSON->send($code, $msg);
     }
 }
 
-if($user->getRole() >= 0){
-switch ($requestMethod) {
-    case 'GET':
-        switch ($ruta[1]) {
-            case 'jugar':
-                $servicePartida->createPartida($user->getId());
-                break;
-            case 'ranking':
-                $servicePartida->getRanking();
-                break;
-            default:
-                notFound($serviceJSON);
-        }
-        break;
-    case 'POST':
-        switch ($ruta[1]) {
-            case 'jugar':
-                return $servicePartida->uncoverCasilla($user->getId());
-                break;
-            default:
-                return notFound($serviceJSON);
-        }
-        break;
-    default:
-        return notSuported($serviceJSON);
-    }
-}
 
 function notFound($serviceJSON)
 {
@@ -110,9 +154,15 @@ function notFound($serviceJSON)
     $serviceJSON->send($code, $msg);
 }
 
-function notSuported($serviceJSON)
+function notSupported($serviceJSON)
 {
     $code = 405;
     $msg = "METHOD NOT SUPPORTED YET";
+    $serviceJSON->send($code, $msg);
+}
+
+function noParameters($serviceJSON){
+    $code = 402;
+    $msg = "PARAMETER REQUIRED";
     $serviceJSON->send($code, $msg);
 }
