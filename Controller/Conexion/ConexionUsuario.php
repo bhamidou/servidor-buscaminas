@@ -19,7 +19,37 @@ class ConexionUsuario{
 
     }
 
-    function createUser($email, $pass, $nombre,$role){
+    public function updateNombre($nombre, $email){
+        $con = new Conexion();
+        $con->conectar();
+        
+        $consulta = "UPDATE  ". Constantes::$TABLE_usuario."  SET nombre = ? WHERE email = ?  ";
+        $stmt = Conexion::$conexion->prepare($consulta);
+
+        $stmt->bind_param("ss", $nombre, $email);
+
+        $stmt->execute();
+
+        $con->desconectar();
+    }
+
+    public function updateRole($role, $email){
+        $con = new Conexion();
+        $con->conectar();
+        
+        $consulta = "UPDATE  ". Constantes::$TABLE_usuario."  SET rol = ? WHERE email = ?  ";
+        $stmt = Conexion::$conexion->prepare($consulta);
+
+        $stmt->bind_param("ss", $role, $email);
+
+        $stmt->execute();
+
+        $con->desconectar();
+    }
+
+
+
+    public function createUser($email, $pass, $nombre,$role){
         $con = new Conexion();
         $con->conectar();
 
@@ -31,13 +61,9 @@ class ConexionUsuario{
         $stmt->bind_param("ssss", $email, $pass, $nombre, $role);
 
         $stmt->execute();
-        $resultados = $stmt->get_result();
-
-        $rtnUser =$resultados->fetch_array();
 
         $con->desconectar();
-        
-        return $rtnUser;
+
     }
 
     public function deleteUser($idUser){
@@ -73,9 +99,10 @@ class ConexionUsuario{
 
         $arr =$resultados->fetch_array();
 
-        $rtnUser = new Usuario;
+        $rtnUser = null;
         if(!empty($arr)){
-            $rtnUser->setUser($arr);
+            $rtnUser = new Usuario;
+            $rtnUser->setArrUser($arr);
         }
 
         $con->desconectar();
@@ -123,7 +150,7 @@ class ConexionUsuario{
 
         foreach($arr as $key){
             $user = new Usuario();
-            $user->setUser($key);
+            $user->setArrUser($key);
             array_push($rtnUsers, $user);
         }
 
