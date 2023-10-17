@@ -23,8 +23,13 @@ class ServiceUser
     {
         $user = new ConexionUsuario();
         $hasPass = md5($password);
-        $rtnUser = $user->getUserByEmailAndPass($email, $hasPass);
-        return $rtnUser;
+        return $user->getUserByEmailAndPass($email, $hasPass);
+
+    }
+
+    public function checkEmail($email){
+        $user = new ConexionUsuario();
+        return $user->getEmail($email);
     }
 
     public function getUserById($idUser)
@@ -58,11 +63,48 @@ class ServiceUser
         $user = new ConexionUsuario();
 
         $rtnUsers = $user->getUsers();
-
         $serviceJSON = new ServiceJSON();
         $code = 200;
         $mesg = "OK";
         $serviceJSON->send($code, $mesg, $rtnUsers);
+    }
+
+    public function createUser($user){
+
+        $serviceJSON = new ServiceJSON();
+        if(!$this->checkEmail($user->getEmail())){
+            $conexionUsuario = new ConexionUsuario();
+            $conexionUsuario->createUser($user->getEmail(), $user->getPass(), $user->getNombre(), $user->getRole());
+            $code = 201;
+            $mesg = "OK";
+            $serviceJSON->send($code, $mesg);
+        }else{
+            $code = 400;
+            $mesg = "EMAIL IS ALREADY IN USE";
+            $serviceJSON->send($code, $mesg);
+        }
+    }
+
+
+    public function deleteUser($idUser){
+        $serviceJSON = new ServiceJSON();
+        if($this->checkId($idUser)){
+            $conexionUsuario = new ConexionUsuario();
+            $conexionUsuario->deleteUser($idUser);
+            $code = 201;
+            $mesg = "OK";
+            $serviceJSON->send($code, $mesg);
+        }else{
+            $code = 404;
+            $mesg = "USER DON'T EXIST";
+            $serviceJSON->send($code, $mesg);
+        }
+    }
+
+    public function checkId($idUser){
+        $userConexion = new ConexionUsuario();
+        $user = $userConexion->getUserById($idUser);
+        return $user->getId();
     }
 
     public function newPassword($email, $newPass = null)
