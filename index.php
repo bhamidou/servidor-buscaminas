@@ -45,9 +45,7 @@ if ($checkPersona) {
                                 if (!empty($ruta[3])) {
                                     $serviceUsuario->getUserById($ruta[3]);
                                 } else {
-                                    $code = 402;
-                                    $msg = "PARAMETER ID REQUIRED";
-                                    $serviceJSON->send($code, $msg);
+                                    noParameters($serviceJSON);
                                 }
                                 break;
                         }
@@ -128,7 +126,6 @@ if ($checkPersona) {
                 break;
             case 'POST':
                 if($ruta[1] == 'jugar') {
-                    echo $decode["pos"];
                     $servicePartida->uncoverCasilla($user->getId(), $decode["pos"]);
                     }
                 else{
@@ -141,9 +138,9 @@ if ($checkPersona) {
                 break;
         }
     }
-} else {
     // en caso de que el usuario no tenga credenciales
-    if (!empty($ruta[1]) && $ruta[1] == 'signup') {
+} elseif(!empty($ruta[1]) && $ruta[1] == 'signup') {
+      
         $user = new Usuario();
         $user->setUser($decode["user"]);
         $serviceUsuario->createUser($user);
@@ -151,17 +148,20 @@ if ($checkPersona) {
         //en caso de que el usuario tenga credenciales
         //pero no sepa su contraseña
     }elseif(!empty($ruta[1]) && $ruta[1] == 'password'){
+        
         if(!empty($decode["getNewPassword"])){
             $email = $decode["getNewPassword"]["email"];
             $pass = $decode["getNewPassword"]["pass"];
             $serviceUsuario->newPassword($email, $pass);
+        }else{
+            noParameters($serviceJSON);
         }
+
     } else{
-        $code = 401;
-        $msg = "ERROR USER CREDENTIALS";
-        $serviceJSON->send($code, $msg);
+        notFound($serviceJSON);
     }
-}
+
+
 
 
 function notFound($serviceJSON)
