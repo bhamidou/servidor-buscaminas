@@ -140,6 +140,23 @@ class ServiceUser
         return $user->getId();
     }
 
+    public function setCountJugadaPartida($idUser){
+        $userConexion = new ConexionUsuario();
+        $user = $userConexion->getUserById($idUser);
+        $jugadas = $user->getPartidasJugadas();
+        $jugadas++;
+        echo $jugadas;
+        $userConexion->updateCountJugadaPartida($idUser, $jugadas);
+    }
+
+    public function setCountGanadaPartida($idUser){
+        $userConexion = new ConexionUsuario();
+        $user = $userConexion->getUserById($idUser);
+        $ganadas = $user->getPartidasGanadas();
+        $ganadas++;
+        $userConexion->updateCountGanadaPartida($idUser, $ganadas);
+    }
+
     public function newPassword($email, $newPass = null)
     {
         $serviceJSON = new ServiceJSON();
@@ -152,9 +169,10 @@ class ServiceUser
             $conexionUsuario = new ConexionUsuario();
 
             $conexionUsuario->updatePassword($email, $hasPash);
+            
+            $nombre = $conexionUsuario->getEmail($email);
 
-            $mail = new Mail();
-            $mail->sendmail();
+            Mail::sendmail($email, $nombre["nombre"], $newPass);
 
             $code = 202;
             $mesg = "UPDATED PASSWORD";
