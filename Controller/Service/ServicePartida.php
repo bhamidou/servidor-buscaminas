@@ -3,6 +3,7 @@
 require_once './Controller/Conexion/ConexionPartida.php';
 require_once __DIR__ . '../../../Constantes.php';
 require_once './Controller/Service/ServiceJSON.php';
+require_once __DIR__.'/ServiceUser.php';
 
 class ServicePartida
 {
@@ -13,68 +14,85 @@ class ServicePartida
 
         $rank = $partida->getRanking();
 
+        $rtnRank["nombre"] = $rank[0];
+        $rtnRank["patidasGanadas"] = $rank[1];
+
         $cod = 200;
         $mesg = "OK";
 
         $serviceJSON = new ServiceJSON();
-        $serviceJSON->send($cod, $mesg, $rank);
+        $serviceJSON->send($cod, $mesg, $rtnRank );
     }
 
     public function uncoverCasilla($idUser, $posicion)
     {
         $partida = new ConexionPartida();
         $serviceJSON = new ServiceJSON();
+        $conexionUsuario = new ServiceUser();
 
         $checkLastResultado = $partida->getLastPartida($idUser);
-        if ($checkLastResultado["resultado"] == 0) {
-            
+        if ($checkLastResultado->getResultado() == 0) {
+
             $tab = $partida->getPartidaByUserId($idUser);
             $tablero = $tab->getTFinal();
             $board = explode(",", $tablero);
             $invisible = explode(",", $tab->getTVacio());
-            
+            $countBoard = $this->countUncovered($board);
+            $countInvisible = $this->countUncovered($invisible);
 
-            if ($this->countUncovered($board) !=  $this->countUncovered($invisible)) {
-
+            if ($countInvisible != $countBoard) {
                 $additionalMsg = "BOX SUCCESSFULLY UNCOVERED";
+
                 $normalizePosicion = $posicion - 1;
+                if($this->checkRange($normalizePosicion, count($board), 0)){
                 $numFlags = 0;
+                $cod = 200;
+                $msg = "OK";
 
                 if ($board[$normalizePosicion] > 0) {
                     $cod = 404;
-                    $mesg = "FOUND THE FLAG, YOU LOST";
-                    $serviceJSON->send($cod, $mesg, $board);
+                    $msg = "FOUND THE FLAG, YOU LOST";
+
+                    $additionalMsg = implode(",", $board);
+
                     $partida->updatePartidaRendirse($idUser);
                     $numFlags = strval($board[$normalizePosicion]);
-                } elseif ($board[$normalizePosicion + 1] > 0 && $board[$normalizePosicion - 1]) {
-                    $cod = 200;
-                    $mesg = "BE CAREFUL WITH THE RIGHT AND LEFT";
-                    $serviceJSON->send($cod, $mesg, $additionalMsg);
-                    $numFlags = 2;
-                } elseif ($board[$normalizePosicion + 1] > 0) {
-                    $cod = 200;
-                    $mesg = "BE CAREFUL WITH THE RIGHT";
-                    $serviceJSON->send($cod, $mesg, $additionalMsg);
-                    $numFlags = 1;
-                } elseif ($board[$normalizePosicion - 1]) {
 
-                    $cod = 200;
-                    $mesg = "BE CAREFUL WITH THE LEFT";
-                    $serviceJSON->send($cod, $mesg, $additionalMsg);
+                } elseif($normalizePosicion < count($board)-1 && $normalizePosicion > 0 && $board[$normalizePosicion + 1] > 2 && $board[$normalizePosicion - 1]>2) {
+                    $additionalMsg = "BE CAREFUL WITH THE RIGHT AND LEFT";
+                    $numFlags = 2;
+                } elseif ($normalizePosicion < count($board)-1 && $board[$normalizePosicion + 1] >2) {
+                    $additionalMsg = "BE CAREFUL WITH THE RIGHT";
                     $numFlags = 1;
+
+                } elseif ($normalizePosicion> 0 && $board[$normalizePosicion - 1]>2) {
+                    $additionalMsg = "BE CAREFUL WITH THE LEFT";
+                    $numFlags = 1;
+
                 } else {
-                    $cod = 200;
-                    $mesg = "BOX SUCCESSFULLY UNCOVERED";
-                    $serviceJSON->send($cod, $mesg);
+                    $additionalMsg = "BOX SUCCESSFULLY UNCOVERED";
                 }
 
-                $invisible[$normalizePosicion] = strlen($numFlags);
-                print_r($invisible);
+                
+                $invisible[$normalizePosicion] = $numFlags;
 
                 $rtnInvisible = implode(",", $invisible);
                 $board[$normalizePosicion] = $numFlags;
-                $partida->setPosicion($idUser, $rtnInvisible);
+                $rtnBoard = implode(",", $board);
+
+
+                $partida->setPosicionJugando($idUser, $rtnInvisible);
+                $partida->setPosicionResuelto($idUser, $rtnBoard);
+
+                $serviceJSON->send($cod, $msg, [$additionalMsg,  $rtnInvisible]);
+                }else{
+                    $cod = 400;
+                    $mesg = "POSITION OUT OF RANGE";
+                    $serviceJSON->send($cod, $mesg);
+                }
             } else {
+                $partida->setWin($idUser);
+                $conexionUsuario->setCountGanadaPartida($idUser);
                 $cod = 200;
                 $mesg = "YOU HAVE MARKED ALL THE FLAGS, YOU HAVE WON";
                 $serviceJSON->send($cod, $mesg);
@@ -82,7 +100,6 @@ class ServicePartida
         } else {
             $cod = 404;
             $mesg = "NOT FOUND BOARD FOR PLAYING";
-            $serviceJSON = new ServiceJSON();
             $serviceJSON->send($cod, $mesg);
         }
     }
@@ -92,6 +109,7 @@ class ServicePartida
 
         $partida = new ConexionPartida();
         $serviceJSON = new ServiceJSON();
+        $conexionUsuario = new ServiceUser();
 
         /**
          * check para poder crear una partida si no la tiene el usuario
@@ -100,7 +118,7 @@ class ServicePartida
 
         $checkLastResultado = $partida->getLastPartida($idUser);
 
-        if ($checkLastResultado == null || $checkLastResultado["resultado"] != 0) {
+        if ($checkLastResultado->getResultado() != 0) {
             if (empty($size) && empty($numFlags)) {
                 $size = Constantes::$Casilla_size;
                 $numFlags = Constantes::$Casillas_flags;
@@ -115,15 +133,15 @@ class ServicePartida
             $partida->insertNewPartida($idUser, $tab1, $tab2);
 
             $tablero = $this->getTableroInvisible($idUser);
-
+            $conexionUsuario->setCountJugadaPartida($idUser);
             $cod = 201;
             $mesg = "BOARD CREATED";
-            $serviceJSON->send($cod, $mesg, $tablero["jugando"]);
+            $serviceJSON->send($cod, $mesg, ["board" => $tablero["jugando"]]);
         } else {
             $cod = 401;
             $mesg = "BOARD NOT CREATED";
             $extra = "YOU ALREADY HAVE A BOARD CREATED";
-            $serviceJSON->send($cod, $mesg, $extra);
+            $serviceJSON->send($cod, $mesg, ["alert" => $extra, "board" => $checkLastResultado->getTVacio()]);
         }
     }
 
@@ -131,13 +149,23 @@ class ServicePartida
     {
         $partida = new ConexionPartida();
         $serviceJSON = new ServiceJSON();
+        $statusPartida = $partida->getLastPartida($idUser);
+        $resultadoPartida = $statusPartida->getResultado();
 
-        $partida->updatePartidaRendirse($idUser);
-        $tablero = $partida->getTableroResuelto($idUser);
+        $additionalMsg = null;
+        if ($resultadoPartida == 0) {
+            $code = 201;
+            $msg = "OK";
 
-        $cod = 201;
-        $mesg = "OK";
-        $serviceJSON->send($cod, $mesg, $tablero["resuelto"]);
+            $partida->updatePartidaRendirse($idUser);
+            $tablero = $partida->getTableroResuelto($idUser);
+            $additionalMsg = $tablero["resuelto"];
+        } elseif ($resultadoPartida == 1 || $resultadoPartida  == -1) {
+            $code = 400;
+            $msg = "THE LAST BOARD IS ALREADY FINISHED";
+        }
+
+        $serviceJSON->send($code, $msg, $additionalMsg);
     }
     public function getTableroInvisible($idUser)
     {
@@ -149,21 +177,18 @@ class ServicePartida
     {
         $rtnNumFlags = 0;
         foreach ($tableroFinal as $key => $value) {
-            if ($value == 1) {
+            if ($value == 1 || $value == 2 || $value == 0) {
                 $rtnNumFlags++;
             }
         }
         return $rtnNumFlags;
     }
 
-    public function countFlags($tableroFinal)
-    {
-        $rtnNumFlags = 0;
-        foreach ($tableroFinal as $key => $value) {
-            if ($value == 0) {
-                $rtnNumFlags++;
-            }
-        }
-        return $rtnNumFlags;
+    
+
+    public function checkRange($normalizePosicion, $max,$min){
+
+        return $normalizePosicion>=$min && $normalizePosicion<=$max;
+        
     }
 }
