@@ -82,7 +82,7 @@ class ServiceUser
         $serviceJSON = new ServiceJSON();
         if(!$this->checkEmail($user->getEmail())){
             $conexionUsuario = new ConexionUsuario();
-            $conexionUsuario->createUser($user->getEmail(), $user->getPass(), $user->getNombre(), $user->getRole());
+            $conexionUsuario->createUser($user->getEmail(), md5($user->getPass()), $user->getNombre(), $user->getRole());
             $code = 201;
             $mesg = "OK";
             $serviceJSON->send($code, $mesg);
