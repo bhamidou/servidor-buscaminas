@@ -1,19 +1,31 @@
 <?php
 
 class Partida {
-    private $id;
-    private $idUsuario;
-    private $tVacio;
-    private $tFinal;
-    private $resultado;
+    public $id;
+    public $idUsuario;
+    public $tVacio;
+    public $tFinal;
+    public $resultado;
     
-	public function __construct($id, $idUsuario) {
+	// public function __toString()
+	// {
+	// 	return 'id: '.$this->$id.''..''..''..''...;
+	// }
 
-		$this->id = $id;
-		$this->idUsuario = $idUsuario;
+	public function setPartida($arrValues){
+        $this->setIdUsuario($arrValues["idUsuario"]);
+        $this->setTVacio($arrValues["jugando"]);
+        $this->setTFinal($arrValues["resuelto"]);
+        $this->setResultado($arrValues["resultado"]);
+    }
 
+	public function setPartida2($arrValues){
+		$this->setIdUsuario($arrValues["idUsuario"]);
+        $this->setTVacio($arrValues["tVacio"]);
+        $this->setTFinal($arrValues["tFinal"]);
+        $this->setResultado($arrValues["resultado"]);
 	}
-
+	
 	public function getId() {
 		return $this->id;
 	}
@@ -46,11 +58,11 @@ class Partida {
 		$this->tFinal = $value;
 	}
 
-	public function getResultad() {
+	public function getResultado() {
 		return $this->resultado;
 	}
 
-	public function setResultad($value) {
+	public function setResultado($value) {
 		$this->resultado = $value;
 	}
 }
