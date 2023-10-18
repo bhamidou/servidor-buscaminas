@@ -46,9 +46,7 @@ Antes de comenzar, asegúrate de tener los siguientes requisitos:
 
 3. Ejecuta el script SQL proporcionado en `database.sql` para crear las tablas necesarias en tu base de datos.
 
-## 🚀 Uso
-
-## Endpoints del Programa
+## 🚀 Uso | Endpoints del Programa
 
 A continuación se enumeran los endpoints disponibles:
 
