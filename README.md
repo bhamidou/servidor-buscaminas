@@ -23,7 +23,7 @@
 - Juego clásico de Buscaminas en una línea.
 - CRUD completo para gestionar jugadores.
 - Puntuaciones de jugadores guardadas para competir en el tablero de líderes.
-- Interfaz de usuario amigable y atractiva.
+- Uso de JSON.
 - Seguridad de datos para proteger la información del jugador.
 
 ## 📋 Requisitos
@@ -47,6 +47,12 @@ Antes de comenzar, asegúrate de tener los siguientes requisitos:
 3. Ejecuta el script SQL proporcionado en `database.sql` para crear las tablas necesarias en tu base de datos.
 
 ## 🚀 Uso | Endpoints del Programa
+
+Montar un servidor con php:
+
+```sh
+php -S 127.0.0.1:1234
+```
 
 A continuación se enumeran los endpoints disponibles:
 
