@@ -11,6 +11,6 @@ class ServiceJSON {
             echo json_encode($rtnArr);
         }
 
-        header("HTTP/1.1 $code $msg");
+        header("HTTP/1.1 $code $msg");  
     }
 }
