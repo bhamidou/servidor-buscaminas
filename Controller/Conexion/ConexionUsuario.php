@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'../Conexion.php';
+require __DIR__.'/Conexion.php';
 
 class ConexionUsuario{
 
@@ -178,5 +178,33 @@ class ConexionUsuario{
         
         return $email;
 
+    }
+
+    public function updateCountJugadaPartida($idUser, $jugadas){
+        $con = new Conexion();
+        $con->conectar();
+        
+        $consulta = "UPDATE  ". Constantes::$TABLE_usuario."  SET partidasJugadas = ? WHERE ID = ?";
+        $stmt = Conexion::$conexion->prepare($consulta);
+
+        $stmt->bind_param("ii", $jugadas, $idUser);
+
+        $stmt->execute();
+
+        $con->desconectar();
+    }
+
+    public function updateCountGanadaPartida($idUser, $jugadas){
+        $con = new Conexion();
+        $con->conectar();
+        
+        $consulta = "UPDATE  ". Constantes::$TABLE_usuario."  SET partidasGanadas = ? WHERE ID = ?";
+        $stmt = Conexion::$conexion->prepare($consulta);
+
+        $stmt->bind_param("ii",  $jugadas, $idUser);
+
+        $stmt->execute();
+
+        $con->desconectar();
     }
 }

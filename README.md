@@ -46,15 +46,75 @@ Antes de comenzar, asegúrate de tener los siguientes requisitos:
 
 3. Ejecuta el script SQL proporcionado en `database.sql` para crear las tablas necesarias en tu base de datos.
 
-## 🚀 Uso
+## 🚀 Uso | Endpoints del Programa
 
-1. Accede a la URL de tu proyecto en el navegador.
+A continuación se enumeran los endpoints disponibles:
 
-2. Regístrate como jugador o inicia sesión si ya tienes una cuenta.
+### Rutas de Administrador (`/admin`)
 
-3. ¡Comienza a jugar al Buscaminas y compite para obtener la puntuación más alta!
+#### GET `/admin/users`
+- Descripción: Obtiene la lista de usuarios.
+- Ejemplo de uso: `/admin/users`
 
-4. Visita la sección de Jugadores para administrar tu perfil.
+#### GET `/admin/user/{id}`
+- Descripción: Obtiene los detalles de un usuario específico por su ID.
+- Ejemplo de uso: `/admin/user/123`
+
+#### POST `/admin/user`
+- Descripción: Crea un nuevo usuario.
+- Ejemplo de uso: `/admin/user`
+- Parámetros requeridos: `user` (Datos del usuario).
+
+#### POST `/admin/user`
+- Descripción: Actualiza el nombre y el rol de un usuario.
+- Ejemplo de uso: `/admin/user`
+- Parámetros requeridos: `update` (Datos de actualización).
+
+#### DELETE `/admin/user/{id}`
+- Descripción: Elimina un usuario por su ID.
+- Ejemplo de uso: `/admin/user/123`
+
+### Rutas Generales
+A estas rutas solo podrán acceder usuarios registrados, pero con cualquier tipo de rol.
+
+#### GET `/jugar`
+- Descripción: Inicia una nueva partida.
+- Ejemplo de uso: `/jugar`
+- Parámetros opcionales: `size` (número de casillas), `numFlags` (número de minas).
+- Ejemplo de uso: `/jugar/{size}/{numFlags}`
+
+#### GET `/ranking`
+- Descripción: Obtiene el ranking de partidas.
+- Ejemplo de uso: `/ranking`
+
+#### GET `/surrender`
+- Descripción: Abandona la partida actual.
+- Ejemplo de uso: `/surrender`
+
+#### POST `/jugar`
+- Descripción: Descubre una casilla en la partida.
+- Ejemplo de uso: `/jugar`
+- Parámetros requeridos: `pos` (Posición a descubrir).
+
+### Otras Rutas
+
+#### POST `/signup`
+- Descripción: Registra un nuevo usuario.
+- Ejemplo de uso: `/signup`
+- Parámetros requeridos: `user` (Datos del usuario).
+
+#### POST `/password`
+- Descripción: Permite restablecer la contraseña.
+- Ejemplo de uso: `/password`
+- Parámetros requeridos: `getNewPassword` (Datos de restablecimiento).
+
+### Respuestas del Servidor
+
+El servidor responde a las solicitudes con los siguientes códigos de estado y mensajes:
+
+- Código de estado 404: `ROUTE NOT FOUND` (Ruta no encontrada).
+- Código de estado 405: `METHOD NOT SUPPORTED YET` (Método no admitido).
+- Código de estado 402: `PARAMETER REQUIRED` (Parámetro requerido).
 
 ## 🤝 Contribución
 

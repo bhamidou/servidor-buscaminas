@@ -4,15 +4,12 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-
-require_once 'phpmailer/src/Exception.php';
-require_once 'phpmailer/src/PHPMailer.php';
-require_once 'phpmailer/src/SMTP.php';
-
+require_once __DIR__.'/phpmailer/src/Exception.php';
+require_once __DIR__.'/phpmailer/src/PHPMailer.php';
+require_once __DIR__.'/phpmailer/src/SMTP.php';
 class Mail {
-    public function sendmail($destinomail, $destinonombre, $asunto, $newPass)
+    static function sendmail($email, $name, $newpass)
     {
-
         try {
             $mail = new PHPMailer();
             //Configuración del servidor
@@ -29,7 +26,7 @@ class Mail {
             $mail->setFrom(Constantes::$MAILUsername, Constantes::$MAILFromName);
 
             //Destinatarios
-            $mail->addAddress($destinomail, $destinonombre);     //Añadir un destinatario, el nombre es opcional
+            $mail->addAddress($email, $name);     //Añadir un destinatario, el nombre es opcional
 
             //Destinatarios opcionales
             // $mail->addReplyTo('info@example.com', 'Information');  //Responder a
@@ -41,14 +38,15 @@ class Mail {
 
             //Nombre opcional
             $mail->isHTML(true);                         //Establecer el formato de correo electrónico en HTMl
-            $mail->Subject = $asunto;
-            $mail->Body    = `<meta charset="ISO-8859-1"> ¡Su nueva contraseña es: <b>$newPass</b>`;
-            $mail->AltBody = 'Desde Gitignore Tech esperemos que disfrute de su cuenta';
+            $mail->Subject = "New Password!";
+            $mail->Body    = "Su nueva contrase&ntilde;a es: <b>$newpass</b> <br>Desde Gitignore Tech esperemos que disfrute de su cuenta";
+            
 
             $mail->send();    //Enviar correo eletrónico
 
+            echo "llego hasta aquí";
         } catch (Exception $e) {
-
+            echo $e;
         }
     }
 }

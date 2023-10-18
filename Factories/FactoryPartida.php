@@ -6,7 +6,7 @@ class FactoryPartida{
         $tablero = array_fill(0,$size,0);
 
         while (0 < $numFlags) {
-            $tablero[rand(0,$size-1)]=1;
+            $tablero[rand(0,$size-1)]=9;
             $numFlags--;
         }
         

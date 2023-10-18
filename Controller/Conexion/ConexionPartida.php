@@ -25,27 +25,42 @@ class ConexionPartida
         echo json_encode($rtn);
     }
 
-    public function getPartida($id)
+    public function getPartidaByUserId($idUser)
     {
         $con = new Conexion();
         $con->conectar();
 
-        $consulta = "SELECT * FROM PARTIDA WHERE id = ?";
+        $consulta = "SELECT * FROM ". Constantes::$TABLE_partida." WHERE idUsuario = ? and resultado = 0";
 
-        $stmt = mysqli_prepare(Conexion::$conexion, $consulta);
-        mysqli_stmt_bind_param($stmt, "i", $id);
-        mysqli_stmt_execute($stmt);
+        $stmt = Conexion::$conexion->prepare($consulta);
 
-        $resultados = mysqli_stmt_get_result($stmt);
+        $stmt->bind_param("i", $idUser);
+
+        $stmt->execute();
+        $resultados = $stmt->get_result();
+
+        $partida=$resultados->fetch_array();
+
+        $rtnPartida = new Partida();
+        $rtnPartida->setPartida($partida);
+
         $con->desconectar();
+        
+        return $rtnPartida;
+    }
 
-        $rtn = [];
+    public function setWin($idUser){
+        $con = new Conexion();
+        $con->conectar();
+        
+        $consulta = "UPDATE  ". Constantes::$TABLE_partida."  SET resultado = 1 WHERE idUsuario = ?  and resultado = 0";
+        $stmt = Conexion::$conexion->prepare($consulta);
 
-        while ($fila = mysqli_fetch_row($resultados)) {
-            $rtn[] = $fila[0] . "," . $fila[1] . "," . $fila[2] . "," . $fila[3];
-        }
+        $stmt->bind_param("i", $idUser);
 
-        echo json_encode($rtn);
+        $stmt->execute();
+
+        $con->desconectar();
     }
     
     public function updatePartidaRendirse($idUser)
@@ -57,6 +72,34 @@ class ConexionPartida
         $stmt = Conexion::$conexion->prepare($consulta);
 
         $stmt->bind_param("i", $idUser);
+
+        $stmt->execute();
+
+        $con->desconectar();
+    }
+
+    public function setPosicionJugando($idUser, $tablero)
+    {
+        $con = new Conexion();
+        $con->conectar();
+        
+        $consulta = "UPDATE  ". Constantes::$TABLE_partida."  SET jugando = ? WHERE idUsuario = ?  and resultado = 0";
+        $stmt = Conexion::$conexion->prepare($consulta);
+        $stmt->bind_param("si",$tablero, $idUser);
+
+        $stmt->execute();
+
+        $con->desconectar();
+    }
+
+    public function setPosicionResuelto($idUser, $tablero)
+    {
+        $con = new Conexion();
+        $con->conectar();
+        
+        $consulta = "UPDATE  ". Constantes::$TABLE_partida."  SET resuelto = ? WHERE idUsuario = ?  and resultado = 0";
+        $stmt = Conexion::$conexion->prepare($consulta);
+        $stmt->bind_param("si",$tablero, $idUser);
 
         $stmt->execute();
 
@@ -85,12 +128,12 @@ class ConexionPartida
         $stmt->execute();
         $resultados = $stmt->get_result();
 
-        $rtnUser=$resultados->fetch_array();
+        $partida=$resultados->fetch_array();
 
-
+        
         $con->desconectar();
 
-        return $rtnUser;
+        return $partida;
     }
 
     public function getTableroJugando($idUser)
@@ -120,7 +163,8 @@ class ConexionPartida
         $con = new Conexion();
         $con->conectar();
 
-        $consulta = "SELECT USUARIO.nombre, count(resuelto) as ganadas FROM PARTIDA inner join USUARIO ON PARTIDA.idUsuario = USUARIO.ID where resuelto=1 GROUP by idUsuario order by ganadas";
+        $consulta = "SELECT USUARIO.nombre, count(resuelto) as ganadas FROM PARTIDA inner join USUARIO ON PARTIDA.idUsuario = USUARIO.ID where resuelto=1 GROUP by idUsuario order by ganadas desc";
+
 
         $stmt = mysqli_prepare(Conexion::$conexion, $consulta);
         mysqli_stmt_execute($stmt);
@@ -129,7 +173,7 @@ class ConexionPartida
 
         $rtn = mysqli_fetch_row($resultados);
 
-        return json_encode($rtn);
+        return $rtn;
     }
 
 
@@ -157,7 +201,7 @@ class ConexionPartida
         $con = new Conexion();
         $con->conectar();
 
-        $consulta = "SELECT resultado FROM ". Constantes::$TABLE_partida." where idUsuario = ? order by ID desc";
+        $consulta = "SELECT * FROM ". Constantes::$TABLE_partida." where idUsuario = ? order by ID desc";
 
         $stmt = Conexion::$conexion->prepare($consulta);
 
@@ -166,11 +210,45 @@ class ConexionPartida
         $stmt->execute();
         $resultados = $stmt->get_result();
 
-        $rtnResultado = $resultados->fetch_array();
+        $partida = $resultados->fetch_array();
+
+        $rtnPartida = new Partida();
+
+        $rtnPartida->setPartida($partida);
+
+        // $rtnPartida = null;
+        // if($rtnPartida != null){
+        //     $rtnPartida = new Partida();
+        //     $rtnPartida->setPartida($partida);
+        // }
+
+        $con->desconectar();
+        return $rtnPartida;
+    }
+
+    public function getTableroByIdUser($idUser){
+        $con = new Conexion();
+        $con->conectar();
+
+        $consulta = "SELECT * FROM ". Constantes::$TABLE_partida." WHERE idUsuario = ?";
+
+        $stmt = Conexion::$conexion->prepare($consulta);
+
+        $stmt->bind_param("i", $idUser);
+
+        $stmt->execute();
+        $resultados = $stmt->get_result();
+
+        $partida=$resultados->fetch_array();
+
+        $rtnPartida = new Partida();
+        $rtnPartida->setPartida($partida);
+
+
 
         $con->desconectar();
         
-        return $rtnResultado;
+        return $rtnPartida;
     }
 
     public function getTableroResuelto($idUser){
