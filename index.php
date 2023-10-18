@@ -92,14 +92,14 @@ if ($checkPersona) {
                     }
                     break;
                 default: {
-                        notFound($serviceJSON);
+                    notSupported($serviceJSON);
                     }
                     break;
             }
         }
     }
     //caulquier otra ruta que no sea admin, luego dentro comprobaré las rutas
-    if (!empty($ruta[1])) {
+    if (!empty($ruta[1]) &&  $ruta[1] != "admin" ) {
         switch ($requestMethod) {
             case 'GET':
                 switch ($ruta[1]) {

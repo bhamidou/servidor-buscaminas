@@ -50,6 +50,16 @@ Antes de comenzar, asegúrate de tener los siguientes requisitos:
 
 A continuación se enumeran los endpoints disponibles:
 
+### Login
+Enviar en el body:
+```json
+{
+   "email":"badrhamidou@gmail.com",
+   "pass":"1234"
+
+}
+```
+
 ### Rutas de Administrador (`/admin`)
 
 #### GET `/admin/users`
@@ -60,15 +70,54 @@ A continuación se enumeran los endpoints disponibles:
 - Descripción: Obtiene los detalles de un usuario específico por su ID.
 - Ejemplo de uso: `/admin/user/123`
 
-#### POST `/admin/user`
+#### POST `/admin/user` 
 - Descripción: Crea un nuevo usuario.
 - Ejemplo de uso: `/admin/user`
 - Parámetros requeridos: `user` (Datos del usuario).
+
+```json
+{
+   "email":"badrhamidou@gmail.com",
+   "pass":"1234",
+   "user" : {
+      "email":"test@foo.tld",
+      "pass":"1234",
+      "nombre":"test",
+      "rol":"0"
+   }
+}
+```
 
 #### POST `/admin/user`
 - Descripción: Actualiza el nombre y el rol de un usuario.
 - Ejemplo de uso: `/admin/user`
 - Parámetros requeridos: `update` (Datos de actualización).
+
+Para admin:
+```json
+{
+   "email":"badrhamidou@gmail.com",
+   "pass":"1234",
+   "getNewPassword" : {
+      "email":"test@foo.tld",
+      "pass":"1234"
+   }
+
+}
+```
+
+Para usuario sin login:
+```json
+{
+   "getNewPassword" : {
+      "email":"test@foo.tld",
+      "pass":"1234"
+   }
+
+}
+```
+
+
 
 #### DELETE `/admin/user/{id}`
 - Descripción: Elimina un usuario por su ID.
@@ -83,18 +132,47 @@ A estas rutas solo podrán acceder usuarios registrados, pero con cualquier tipo
 - Parámetros opcionales: `size` (número de casillas), `numFlags` (número de minas).
 - Ejemplo de uso: `/jugar/{size}/{numFlags}`
 
+
 #### GET `/ranking`
 - Descripción: Obtiene el ranking de partidas.
 - Ejemplo de uso: `/ranking`
+- Respuesta exitosa:
+   * Código de estado HTTP 200.
+   * Devuelve una lista de nombres de jugadores y la cantidad de partidas ganadas en formato JSON.
+- Respuesta de error:
+   * Código de estado HTTP 404 si no hay datos disponibles.
 
 #### GET `/surrender`
 - Descripción: Abandona la partida actual.
 - Ejemplo de uso: `/surrender`
+- Respuesta exitosa:
+   * Código de estado HTTP 201.
+   * Devuelve un mensaje de éxito y el estado final del tablero en formato JSON.
+
+- Respuesta de error:
+   * Código de estado HTTP 400 si el usuario no tiene una partida activa.
 
 #### POST `/jugar`
 - Descripción: Descubre una casilla en la partida.
-- Ejemplo de uso: `/jugar`
+
 - Parámetros requeridos: `pos` (Posición a descubrir).
+- Respuesta exitosa:
+   * Código de estado HTTP 200.
+   * Devuelve un mensaje de éxito y el estado actual del tablero en formato JSON.
+
+- Respuesta de error:
+   * Código de estado HTTP 400 si la posición está fuera de rango.
+   * Código de estado HTTP 404 si el usuario no tiene un juego activo.
+   * Código de estado HTTP 404 si se encuentra una bandera en la casilla descubierta, lo que indica que el usuario ha perdido.
+- Ejemplo de uso: `/jugar`
+
+```json
+{
+   "email":"badrhamidou@gmail.com",
+   "pass":"1234",
+   "pos" : 1
+}
+```
 
 ### Otras Rutas
 
@@ -102,6 +180,16 @@ A estas rutas solo podrán acceder usuarios registrados, pero con cualquier tipo
 - Descripción: Registra un nuevo usuario.
 - Ejemplo de uso: `/signup`
 - Parámetros requeridos: `user` (Datos del usuario).
+```json
+{
+   "user" : {
+      "email":"test@foo.tld",
+      "pass":"1234",
+      "nombre":"test",
+      "rol":"0"
+   }
+}
+```
 
 #### POST `/password`
 - Descripción: Permite restablecer la contraseña.
